@@ -132,16 +132,43 @@
     .form-inline input[type="number"] {
       width: auto;
     }
+    .rate-settings {
+      background-color: #f0f7fa;
+      border: 1px solid #d0e3ed;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .rate-settings h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #2c3e50;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Merchant Fee Calculator</h1>
     
-    <div class="rates-section">
-      <div class="rates-title">Our Flat Rate Fee Structure:</div>
-      <div class="rate-item">• Card Present (In-Person): 2.5% + $0.10 per transaction</div>
-      <div class="rate-item">• Card Not Present (Manual Entry): 3.5% + $0.10 per transaction</div>
+    <div class="rate-settings">
+      <h3>Your Rate Settings</h3>
+      
+      <div class="form-group">
+        <label for="card-present-percent">Card Present (In-Person) Rate:</label>
+        <div class="form-inline">
+          <input type="number" id="card-present-percent" min="0" step="0.01" value="2.5" style="width: 80px;"> % + 
+          <input type="number" id="card-present-fixed" min="0" step="0.01" value="0.10" style="width: 80px;"> $ per transaction
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="card-not-present-percent">Card Not Present (Manual Entry) Rate:</label>
+        <div class="form-inline">
+          <input type="number" id="card-not-present-percent" min="0" step="0.01" value="3.5" style="width: 80px;"> % + 
+          <input type="number" id="card-not-present-fixed" min="0" step="0.01" value="0.10" style="width: 80px;"> $ per transaction
+        </div>
+      </div>
     </div>
     
     <div class="form-group">
@@ -269,7 +296,7 @@
       
       <div class="competitor-section" id="competitor-section">
         <h3>Competitor Comparison</h3>
-        <p>See how your flat rate model compares to competitors:</p>
+        <p>Popular processor rates for comparison:</p>
         <ul>
           <li>Square: 2.6% + $0.10 (in-person) / 3.5% + $0.15 (keyed)</li>
           <li>Stripe: 2.9% + $0.30 (online) / 2.7% + $0.05 (in-person)</li>
@@ -309,6 +336,13 @@
       const monthlyVolume = parseFloat(document.getElementById('monthly-volume').value) || 0;
       const cashRatio = parseFloat(cashRatioSlider.value) / 100;
       const cardPresentRatio = parseFloat(cardPresentSlider.value) / 100;
+      
+      // Get custom rate settings
+      const cardPresentPercent = parseFloat(document.getElementById('card-present-percent').value) / 100;
+      const cardPresentFixed = parseFloat(document.getElementById('card-present-fixed').value);
+      const cardNotPresentPercent = parseFloat(document.getElementById('card-not-present-percent').value) / 100;
+      const cardNotPresentFixed = parseFloat(document.getElementById('card-not-present-fixed').value);
+      
       const yourCostPercent = parseFloat(document.getElementById('your-cost-percent').value) / 100;
       const yourCostFixed = parseFloat(document.getElementById('your-cost-fixed').value);
       
@@ -325,9 +359,9 @@
       const cardPresentTransactions = estimatedCardTransactions * cardPresentRatio;
       const cardNotPresentTransactions = estimatedCardTransactions * (1 - cardPresentRatio);
       
-      // Customer fees (what you charge)
-      const cardPresentFees = (monthlyCardPresentSales * 0.025) + (cardPresentTransactions * 0.10);
-      const cardNotPresentFees = (monthlyCardNotPresentSales * 0.035) + (cardNotPresentTransactions * 0.10);
+      // Customer fees (what you charge) - NOW WITH CUSTOM RATES
+      const cardPresentFees = (monthlyCardPresentSales * cardPresentPercent) + (cardPresentTransactions * cardPresentFixed);
+      const cardNotPresentFees = (monthlyCardNotPresentSales * cardNotPresentPercent) + (cardNotPresentTransactions * cardNotPresentFixed);
       const totalCustomerFees = cardPresentFees + cardNotPresentFees;
       
       // Your processing costs

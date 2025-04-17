@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merchant Fee Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .slider-container {
+      margin-top: 5px;
+    }
+    .slider {
+      width: 100%;
+    }
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 14px;
+      color: #666;
+    }
+    .percentage-display {
+      margin-top: 5px;
+      font-size: 16px;
+      color: #2c3e50;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .results {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #eef8ff;
+      border-radius: 8px;
+      border-left: 5px solid #3498db;
+    }
+    .results h2 {
+      color: #2c3e50;
+      margin-top: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .rates-section {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .rates-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .rate-item {
+      margin-bottom: 3px;
+    }
+    .profit-section {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e8f5e9;
+      border-radius: 8px;
+      border-left: 5px solid #4caf50;
+    }
+    .competitor-section {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #fff3e0;
+      border-radius: 8px;
+      border-left: 5px solid #ff9800;
+    }
+    .form-inline {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .form-inline input[type="number"] {
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Merchant Fee Calculator</h1>
+    
+    <div class="rates-section">
+      <div class="rates-title">Our Flat Rate Fee Structure:</div>
+      <div class="rate-item">• Card Present (In-Person): 2.5% + $0.10 per transaction</div>
+      <div class="rate-item">• Card Not Present (Manual Entry): 3.5% + $0.10 per transaction</div>
+    </div>
+    
+    <div class="form-group">
+      <label for="avg-transaction">Average Transaction Size ($):</label>
+      <input type="number" id="avg-transaction" min="0" step="0.01" value="50">
+    </div>
+    
+    <div class="form-group">
+      <label for="monthly-volume">Average Monthly Transaction Volume ($):</label>
+      <input type="number" id="monthly-volume" min="0" step="0.01" value="10000">
+    </div>
+    
+    <div class="form-group">
+      <label for="cash-ratio">Percentage of Cash vs. Credit Card:</label>
+      <div class="slider-container">
+        <input type="range" id="cash-ratio" class="slider" min="0" max="100" value="30">
+        <div class="percentage-display">
+          Cash: <span id="cash-percentage">30</span>% | Credit Card: <span id="card-percentage">70</span>%
+        </div>
+        <div class="slider-labels">
+          <span>All Credit</span>
+          <span>All Cash</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="card-present-ratio">Percentage of Card Present vs. Card Not Present:</label>
+      <div class="slider-container">
+        <input type="range" id="card-present-ratio" class="slider" min="0" max="100" value="70">
+        <div class="percentage-display">
+          Card Present: <span id="present-percentage">70</span>% | Card Not Present: <span id="not-present-percentage">30</span>%
+        </div>
+        <div class="slider-labels">
+          <span>All Manual Entry</span>
+          <span>All In-Person</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="your-cost">Your Processing Cost Rate:</label>
+      <div class="form-inline">
+        <input type="number" id="your-cost-percent" min="0" step="0.01" value="1.5" style="width: 80px;"> % + 
+        <input type="number" id="your-cost-fixed" min="0" step="0.01" value="0.05" style="width: 80px;"> $ per transaction
+      </div>
+      <small style="display: block; margin-top: 5px; color: #666;">Enter your cost to process transactions</small>
+    </div>
+    
+    <button id="calculate-btn">Calculate Fees & Profit</button>
+    
+    <div class="results" id="results-section" style="display: none;">
+      <h2>Calculation Results</h2>
+      <table>
+        <tr>
+          <th>Metric</th>
+          <th>Monthly</th>
+          <th>Annual</th>
+        </tr>
+        <tr>
+          <td>Total Sales</td>
+          <td>$<span id="monthly-sales">0</span></td>
+          <td>$<span id="annual-sales">0</span></td>
+        </tr>
+        <tr>
+          <td>Credit Card Sales</td>
+          <td>$<span id="monthly-cc-sales">0</span></td>
+          <td>$<span id="annual-cc-sales">0</span></td>
+        </tr>
+        <tr>
+          <td>Cash Sales (no fees)</td>
+          <td>$<span id="monthly-cash-sales">0</span></td>
+          <td>$<span id="annual-cash-sales">0</span></td>
+        </tr>
+        <tr>
+          <td>Card Present Sales</td>
+          <td>$<span id="monthly-present-sales">0</span></td>
+          <td>$<span id="annual-present-sales">0</span></td>
+        </tr>
+        <tr>
+          <td>Card Not Present Sales</td>
+          <td>$<span id="monthly-not-present-sales">0</span></td>
+          <td>$<span id="annual-not-present-sales">0</span></td>
+        </tr>
+        <tr class="highlight">
+          <td>Total Customer Processing Fees</td>
+          <td>$<span id="monthly-customer-fees">0</span></td>
+          <td>$<span id="annual-customer-fees">0</span></td>
+        </tr>
+        <tr>
+          <td>Customer Effective Rate</td>
+          <td colspan="2"><span id="effective-rate">0</span>% of credit card sales</td>
+        </tr>
+        <tr class="highlight">
+          <td>Number of Card Transactions</td>
+          <td><span id="monthly-transactions">0</span></td>
+          <td><span id="annual-transactions">0</span></td>
+        </tr>
+      </table>
+      
+      <div class="profit-section">
+        <h3>Your Profit Analysis</h3>
+        <table>
+          <tr>
+            <th>Metric</th>
+            <th>Monthly</th>
+            <th>Annual</th>
+          </tr>
+          <tr>
+            <td>Your Processing Cost</td>
+            <td>$<span id="monthly-your-cost">0</span></td>
+            <td>$<span id="annual-your-cost">0</span></td>        
+          </tr>
+          <tr class="highlight">
+            <td>Your Profit</td>
+            <td>$<span id="monthly-profit">0</span></td>
+            <td>$<span id="annual-profit">0</span></td>
+          </tr>
+          <tr>
+            <td>Profit Margin</td>
+            <td colspan="2"><span id="profit-margin">0</span>% of fees collected</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="competitor-section" id="competitor-section">
+        <h3>Competitor Comparison</h3>
+        <p>See how your flat rate model compares to competitors:</p>
+        <ul>
+          <li>Square: 2.6% + $0.10 (in-person) / 3.5% + $0.15 (keyed)</li>
+          <li>Stripe: 2.9% + $0.30 (online) / 2.7% + $0.05 (in-person)</li>
+          <li>PayPal: 2.99% + $0.49 (online) / 2.29% + $0.09 (in-person)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get DOM elements
+    const cashRatioSlider = document.getElementById('cash-ratio');
+    const cashPercentage = document.getElementById('cash-percentage');
+    const cardPercentage = document.getElementById('card-percentage');
+    
+    const cardPresentSlider = document.getElementById('card-present-ratio');
+    const presentPercentage = document.getElementById('present-percentage');
+    const notPresentPercentage = document.getElementById('not-present-percentage');
+    
+    const calculateBtn = document.getElementById('calculate-btn');
+    const resultsSection = document.getElementById('results-section');
+
+    // Update sliders
+    cashRatioSlider.addEventListener('input', function() {
+      cashPercentage.textContent = this.value;
+      cardPercentage.textContent = 100 - this.value;
+    });
+    
+    cardPresentSlider.addEventListener('input', function() {
+      presentPercentage.textContent = this.value;
+      notPresentPercentage.textContent = 100 - this.value;
+    });
+    
+    // Calculate fees
+    calculateBtn.addEventListener('click', function() {
+      const avgTransactionSize = parseFloat(document.getElementById('avg-transaction').value) || 0;
+      const monthlyVolume = parseFloat(document.getElementById('monthly-volume').value) || 0;
+      const cashRatio = parseFloat(cashRatioSlider.value) / 100;
+      const cardPresentRatio = parseFloat(cardPresentSlider.value) / 100;
+      const yourCostPercent = parseFloat(document.getElementById('your-cost-percent').value) / 100;
+      const yourCostFixed = parseFloat(document.getElementById('your-cost-fixed').value);
+      
+      // Calculate sales
+      const monthlyCashSales = monthlyVolume * cashRatio;
+      const monthlyCCSales = monthlyVolume - monthlyCashSales;
+      
+      const monthlyCardPresentSales = monthlyCCSales * cardPresentRatio;
+      const monthlyCardNotPresentSales = monthlyCCSales - monthlyCardPresentSales;
+      
+      // Calculate fees - only on credit card transactions
+      const estimatedTotalTransactions = monthlyVolume / avgTransactionSize;
+      const estimatedCardTransactions = estimatedTotalTransactions * (1 - cashRatio);
+      const cardPresentTransactions = estimatedCardTransactions * cardPresentRatio;
+      const cardNotPresentTransactions = estimatedCardTransactions * (1 - cardPresentRatio);
+      
+      // Customer fees (what you charge)
+      const cardPresentFees = (monthlyCardPresentSales * 0.025) + (cardPresentTransactions * 0.10);
+      const cardNotPresentFees = (monthlyCardNotPresentSales * 0.035) + (cardNotPresentTransactions * 0.10);
+      const totalCustomerFees = cardPresentFees + cardNotPresentFees;
+      
+      // Your processing costs
+      const yourProcessingCosts = (monthlyCCSales * yourCostPercent) + (estimatedCardTransactions * yourCostFixed);
+      
+      // Your profit
+      const monthlyProfit = totalCustomerFees - yourProcessingCosts;
+      const profitMargin = totalCustomerFees > 0 ? (monthlyProfit / totalCustomerFees) * 100 : 0;
+      
+      const effectiveRate = monthlyCCSales > 0 ? (totalCustomerFees / monthlyCCSales) * 100 : 0;
+      
+      // Update results
+      document.getElementById('monthly-sales').textContent = monthlyVolume.toFixed(2);
+      document.getElementById('annual-sales').textContent = (monthlyVolume * 12).toFixed(2);
+      
+      document.getElementById('monthly-cc-sales').textContent = monthlyCCSales.toFixed(2);
+      document.getElementById('annual-cc-sales').textContent = (monthlyCCSales * 12).toFixed(2);
+      
+      document.getElementById('monthly-cash-sales').textContent = monthlyCashSales.toFixed(2);
+      document.getElementById('annual-cash-sales').textContent = (monthlyCashSales * 12).toFixed(2);
+      
+      document.getElementById('monthly-present-sales').textContent = monthlyCardPresentSales.toFixed(2);
+      document.getElementById('annual-present-sales').textContent = (monthlyCardPresentSales * 12).toFixed(2);
+      
+      document.getElementById('monthly-not-present-sales').textContent = monthlyCardNotPresentSales.toFixed(2);
+      document.getElementById('annual-not-present-sales').textContent = (monthlyCardNotPresentSales * 12).toFixed(2);
+      
+      document.getElementById('monthly-customer-fees').textContent = totalCustomerFees.toFixed(2);
+      document.getElementById('annual-customer-fees').textContent = (totalCustomerFees * 12).toFixed(2);
+      
+      document.getElementById('effective-rate').textContent = effectiveRate.toFixed(2);
+      
+      document.getElementById('monthly-transactions').textContent = Math.round(estimatedCardTransactions);
+      document.getElementById('annual-transactions').textContent = Math.round(estimatedCardTransactions * 12);
+      
+      document.getElementById('monthly-your-cost').textContent = yourProcessingCosts.toFixed(2);
+      document.getElementById('annual-your-cost').textContent = (yourProcessingCosts * 12).toFixed(2);
+      
+      document.getElementById('monthly-profit').textContent = monthlyProfit.toFixed(2);
+      document.getElementById('annual-profit').textContent = (monthlyProfit * 12).toFixed(2);
+      document.getElementById('profit-margin').textContent = profitMargin.toFixed(2);
+      
+      // Show results
+      resultsSection.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
